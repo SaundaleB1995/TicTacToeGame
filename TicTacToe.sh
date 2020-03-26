@@ -15,23 +15,6 @@ function resettingBoard()
     done
 }
 
-function displayGameBoard() {
-	echo "               "
-	for((i=0; i<row; i++))
-	do
-		for((j=0; j<column; j++))
-		do
-			echo -n " ${game_Board[$i,$j]} |"
-		done
-		echo
-		echo "               "
-	done
-}
-
-resettingBoard
-displayGameBoard
-
-
     function assignedLetter() {
 	if [ $((RANDOM%2)) -eq 1 ]
 	then
@@ -44,7 +27,7 @@ displayGameBoard
 	echo "Assigned Player Letter: " $player
 	echo "Assigned Computer Letter: " $computer
 }
-assignedLetter
+
 
 function checkPlayer() {
 	if [ $((RANDOM%2)) -eq 0 ]
@@ -57,3 +40,32 @@ function checkPlayer() {
 	fi
 }
 checkPlayer
+
+function displayGameBoard() {
+	for((i=1;i<=row;i++))
+	do
+		echo ""
+		echo -n "|"
+		for((j=1;j<=column;j++))
+		do
+			if [ boardOfGame[$i,$j] == 0 ]
+			then
+				echo " X |"
+			elif [ boardOfGame[$i,$j] == 1 ]
+			then
+				echo " O |"
+			else
+				#echo -n "   |"
+				echo -n " + |"
+				
+			fi
+		done
+		echo  ""
+	done
+	echo ""
+}
+resettingBoard
+assignedLetter
+checkPlayer
+displayGameBoard
+
