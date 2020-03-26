@@ -219,6 +219,23 @@
 	fi
 }
 
+function availableCorner(){
+	checkFlag=0
+	local putLetter=$1
+	for((i=0;i<rows;i=$(($i+2))))
+	do
+		for((j=0;j<column;j=$(($j+2))))
+		do
+			if [[ ${game_Board[$i,$j]} == "-" ]]
+			then
+				game_Board[$i,$j]=$putLetter
+				checkFlag=1
+				return
+			fi
+		done
+	done
+}
+
 function playerOrComputerWon() {
 	local Letter=$1
 	if [[ $Letter == $player ]]
