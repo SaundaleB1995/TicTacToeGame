@@ -60,94 +60,196 @@ function displayGameBoard()
 }
 displayGameBoard
 count=0
-function playGame() 
-{
+
+
+function playGame() {
 	while [[ $count -lt 9 ]]
 	do
-	   if [[ $flag == 0 ]]
-       then
-           echo "Player Turn"
-		read -p "Enter Row " row
-		read -p "Enter Col " col
-        if [[ $row -ge $rows && $col -ge $columns ]]
+		if [ $flag == 0 ]
 		then
-               echo "Invalid"
-		elif [[ ${game_Board[$row,$col]} != $player ]]
-		then
-			game_Board[$row,$col]=$player
-            checkWin $player
+			echo "Player Play"
+			read -p "Enter Row " row
+			read -p "Enter Col " col
+			if [[ $row -ge $rows && $col -ge $columns ]]
+			then
+				echo "Invalid"
+			elif [[ ${game_Board[$row,$col]} != $player ]]
+			then
+				game_Board[$row,$col]=$player
+				checkWin $player
 				((count++))
 				flag=1
 			else
 				echo "Cell Is Not Empty"
 			fi
-        elif [ $flag == 1 ]
-        then
-          echo "Computer turn"
-			row=$((RANDOM%3))
-			col=$((RANDOM%3))
-			if [[ ${game_Board[$row,$col]} != $player && ${game_Board[$row,$col]} != $computer ]]
-			then
-				game_Board[$row,$col]=$computer
-				checkWin $computer
-				flag=0
-				((count++))
-			fi
+		elif [ $flag == 1 ]
+		then
+			checkFlag=0
+			echo "Computer Play"
+			computerWinning $computer $computer
+			checkWin $computer
+			((count++))
+			flag=0
 		fi
 	done
 }
-      function checkWin() {
-          letter=$1
-			displayGameBoard
-			winAtRowPosition $1
-			winAtColPosition $1
-			winAtDia $1
-			
-}
-
-function winAtRowPosition() 
-{
-    letter=$1
-	for((i=0;i<$rows;i++))
-	do
-		for((j=0;j<$columns;j++))
-		do
-			if [[ ${game_Board[$i,$j]} == ${game_Board[$i,$(($j+1))]} ]] && [[ ${game_Board[$i,$(($j+1))]} == ${game_Board[$i,$(($j+2))]} ]] && [[ ${game_Board[$i,$j]} == $letter ]]
-			then
-				echo $letter "Win"
-				exit
-			fi
-		done
-	done
-}
-
-function winAtColPosition() 
-{   letter=$1
-	for((i=0;i<3;i++))
-	do
-		for((j=0;j<3;j++))
-		do
-			if [[ ${game_Board[$i,$j]} == ${game_Board[$(($i+1)),$j]} ]] && [[ ${game_Board[$(($i+1)),$c]} == ${game_Board[$(($r+2)),$c]} ]] && [[ ${game_Board[$r,$j]} == $letter ]]
-			then
-				echo $letter "Win"
-				exit
-			fi
-		done
-	done
-}
-
-function winAtDia() 
-{    letter=$1
-	if [[ ${game_Board[0,0]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,2]} ]] && [[ ${game_Board[0,0]} == $letter ]]
+tieCount=0
+function checkWin() {
+	((tieCount++))
+	letter=$1
+	displayGameBoard
+	winAtRowAndColumnPosition	$letter
+	winAtDia $letter
+	if [ $tieCount -gt 8 ]
 	then
-		echo $letter "Win"
-		exit
-	elif [[ ${game_Board[0,2]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,0]} ]] && [[ ${game_Board[0,2]} == $letter ]]
-	  then
-		echo $letter "Win"
+		echo "It's  a Tie"
 		exit
 	fi
 }
+
+function computerWinChecking() {
+	local m=$1
+	local n=$2
+	letter=$3
+	if [[ ${game_Board[$m,$n]} == $letter ]]
+	then
+		((checkCount++))
+	elif [[ ${game_Board[$m,$n]} == $"-" ]]
+	then
+		((newLetterCount++))
+		row=$m
+		column=$n
+	fi
+}
+
+function computerWinning() {
+	checkLetter=$1
+	putLetter=$2
+	checkFlag=0
+	checkFlag1=0
+	#for row win check
+	if [ $checkFlag1 -eq 0 ]
+	then
+		for((i=0;i<3;i++))
+		do
+			checkCount=0
+			newLetterCount=0
+			for((j=0;j<3;j++))
+			do
+				computerWinChecking $i $j $checkLetter
+			done
+		if [[ $checkCount -eq 2 && $newLetterCount -eq 1 ]]
+		then
+			game_Board[$row,$column]=$putLetter
+			checkFlag1=1
+			checkFlag=1
+		fi
+	done
+	fi
+
+	#for col win check
+	if [ $checkFlag1 -eq 0 ]
+	then
+		for((i=0;i<3;i++))
+		do
+			checkCount=0
+			newLetterCount=0
+			for((j=0;j<3;j++))
+			do
+				computerWinChecking $j $i $checkLetter
+			done
+			if [[ $checkCount -eq 2 && $newLetterCount -eq 1 ]]
+			then
+				game_Board[$row,$column]=$putLetter
+				checkFlag1=1
+				checkFlag=1
+			fi
+		done
+	fi
+
+	#for diagonal
+	if [ $checkFlag1 -eq 0 ]
+	then
+		checkCount=0
+		newLetterCount=0
+		for((i=0;i<3;i++))
+		do
+			for((j=0;j<3;j++))
+			do
+				if [ $i -eq $j ]
+				then
+					computerWinChecking $i $j $checkLetter
+				fi
+			done
+		done
+		if [ $checkCount -eq 2 -a $newLetterCount -eq 1 ]
+		then
+			game_Board[$row,$column]=$putLetter
+			checkFlag1=1
+			checkFlag=1
+		fi
+	fi
+
+	#diagonal right to left
+	if [ $checkFlag1 -eq 0 ]
+	then
+		checkCount=0
+		newLetterCount=0
+		for((i=0;i<3;i++))
+		do
+			for((j=$((2-$i));j<3;j++))
+			do
+				computerWinChecking $i $j $checkLetter
+				break
+			done
+		done
+		if [[ $checkCount -eq 2 && $newLetterCount -eq 1 ]]
+		then
+			game_Board[$row,$column]=$putLetter
+			checkFlag1=1
+			checkFlag=1
+		fi
+	fi
+}
+
+function playerOrComputerWon() {
+	local Letter=$1
+	if [[ $Letter == $player ]]
+	then
+		echo "Player Won"
+	else
+		echo "Computer Won"
+	fi
+	exit
+}
+
+function winAtRowAndColumnPosition() {
+	letter=$1
+	for((r=0;r<$rows;r++))
+	do
+		for((c=0;c<$columns;c++))
+		do
+			if [[ ${game_Board[$r,$c]} == ${game_Board[$r,$(($c+1))]} ]] && [[ ${game_Board[$r,$(($c+1))]} == ${game_Board[$r,$(($c+2))]} ]] && [[ ${game_Board[$r,$c]} == $letter ]]
+			then
+				playerOrComputerWon $letter
+			elif [[ ${game_Board[$r,$c]} == ${game_Board[$(($r+1)),$c]} ]] && [[ ${game_Board[$(($r+1)),$c]} == ${game_Board[$(($r+2)),$c]} ]] && [[ ${game_Board[$r,$c]} == $letter ]]
+			then
+				playerOrComputerWon $letter
+			fi
+		done
+	done
+}
+
+function winAtDia() {
+	letter=$1
+	if [[ ${game_Board[0,0]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,2]} ]] && [[ ${game_Board[0,0]} == $letter ]]
+	then
+		playerOrComputerWon $letter
+	elif [[ ${game_Board[0,2]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,0]} ]] && [[ ${game_Board[0,2]} == $letter ]]
+	then
+		playerOrComputerWon $letter
+	fi
+}
+
+
 playGame
-
-
