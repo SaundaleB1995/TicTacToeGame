@@ -104,6 +104,11 @@
             		then
                    		checkCenter
             		fi
+
+			if [ $checkFlag -eq 0 ]
+            		then
+                   		takingSide
+            		fi
 				checkWin $computer
 				((count++))
 				flag=0
@@ -233,7 +238,7 @@ function availableCorner(){
 	local putLetter=$1
 	for((i=0;i<rows;i=$(($i+2))))
 	do
-		for((j=0;j<column;j=$(($j+2))))
+		for((j=0;j<columns;j=$(($j+2))))
 		do
 			if [[ ${game_Board[$i,$j]} == "-" ]]
 			then
@@ -253,6 +258,24 @@ function checkCenter() {
 	else
 		checkFlag=1
 	fi
+}
+
+function takingSide() {
+	for((i=0; i<$rows; i++))
+	do
+		for((j=1; j<$columns; j++))
+		do
+			if [[ ${game_Board[$i,$j]} == "-" ]]
+			then
+				game_Board[$i,$j]=$computer
+				checkFlag=1
+			fi
+		done
+		if [[ $checkFlag -eq 1 ]]
+		then
+			break
+		fi
+	done
 }
 function playerOrComputerWon() {
 	local Letter=$1
