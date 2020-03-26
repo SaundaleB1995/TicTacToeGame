@@ -95,6 +95,15 @@
             		then
                			computerWinning $player $computer
             		fi
+
+                       if [ $checkFlag -eq 0 ]
+           	 then 
+                	 availableCorner
+            	fi
+             		if [ $checkFlag -eq 0 ]
+            		then
+                   		checkCenter
+            		fi
 				checkWin $computer
 				((count++))
 				flag=0
@@ -236,6 +245,15 @@ function availableCorner(){
 	done
 }
 
+function checkCenter() {
+	checkFlag=0
+	if [[ ${game_Board[1,1]} == $"-" ]]
+	then
+		game_Board[1,1]=$computer
+	else
+		checkFlag=1
+	fi
+}
 function playerOrComputerWon() {
 	local Letter=$1
 	if [[ $Letter == $player ]]
