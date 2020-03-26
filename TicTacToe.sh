@@ -45,3 +45,15 @@ displayGameBoard
 	echo "Assigned Computer Letter: " $computer
 }
 assignedLetter
+
+function checkPlayer() {
+	if [ $((RANDOM%2)) -eq 0 ]
+	then
+		flag=0
+		echo "Player Play First"
+	else
+		flag=1
+		echo "Computer Play First"
+	fi
+}
+checkPlayer
