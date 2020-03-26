@@ -1,137 +1,145 @@
-#!/bin/bash
+    #!/bin/bash
      echo "Welcome to Tic Tac Toe Game"
 
 
-rows=3
-columns=3
+	rows=3
+	columns=3
 
-declare -A game_Board
-function resettingBoard() 
-{
-	for ((i=0; i<$rows; i++))
-	do
+	declare -A game_Board
+	function resettingBoard() 
+	{
+	  for ((i=0; i<$rows; i++))
+	  do
 		for ((j=0; j<$columns; j++))
 		do
 			game_Board[$i,$j]="-"
 		done
-	done
-}
+	  done
+        }
 
-function assignletters() {
-	if [ $((RANDOM%2)) -eq 1 ]
-	then
+	function assignletters() {
+	  if [ $((RANDOM%2)) -eq 1 ]
+	  then
 		player="X"
 		computer="O"
-	else
+	  else
 		player="O"
 		computer="X"
-	fi
-	echo "Assigned Player Symbol: " $player
-	echo "Assigned Computer Symbol: " $computer
-}
+	  fi
+		echo "Assigned Player Symbol: " $player
+		echo "Assigned Computer Symbol: " $computer
+	 }
 
-resettingBoard
-assignletters
+	resettingBoard
+	assignletters
 
-function checkFirstPlay() {
-	if [ $((RANDOM%2)) -eq 1 ]
-	then
-		flag=0
-		echo "Player Play First"
-	else
-		flag=1
-		echo "Computer Play First"
-	fi
-}
-checkFirstPlay
+	function checkFirstPlay() {
+	   if [ $((RANDOM%2)) -eq 1 ]
+	   then
+	  	 flag=0
+		 echo "Player Play First"
+	   else
+		 flag=1
+		 echo "Computer Play First"
+	   fi
+      }
+       checkFirstPlay
 
-function displayGameBoard()
-{
-	echo ""
-	for((i=0;i<rows;i++))
-	do
-		for((j=0;j<columns;j++))
+	function displayGameBoard()
+	{
+	   echo ""
+		for((i=0;i<rows;i++))
 		do
-			echo -n " ${game_Board[$i,$j]} |"
+		   for((j=0;j<columns;j++))
+		   do
+		 	 echo -n " ${game_Board[$i,$j]} |"
+		   done
+		         echo
+			echo ""
 		done
-		echo
-		echo ""
-	done
-}
-displayGameBoard
-count=0
-
-
-function playGame() {
-	while [[ $count -lt 9 ]]
-	do
-		if [ $flag == 0 ]
-		then
-			echo "Player Play"
-			read -p "Enter Row " row
-			read -p "Enter Col " col
-			if [[ $row -ge $rows && $col -ge $columns ]]
-			then
-				echo "Invalid"
-			elif [[ ${game_Board[$row,$col]} != $player ]]
-			then
-				game_Board[$row,$col]=$player
-				checkWin $player
-				((count++))
-				flag=1
-			else
-				echo "Cell Is Not Empty"
-			fi
-		elif [ $flag == 1 ]
-		then
-			checkFlag=0
-			echo "Computer Play"
-			computerWinning $computer $computer
-			checkWin $computer
-			((count++))
-			flag=0
-		fi
-	done
-}
-tieCount=0
-function checkWin() {
-	((tieCount++))
-	letter=$1
+           }
 	displayGameBoard
-	winAtRowAndColumnPosition	$letter
-	winAtDia $letter
-	if [ $tieCount -gt 8 ]
-	then
-		echo "It's  a Tie"
-		exit
-	fi
-}
+	count=0
 
-function computerWinChecking() {
-	local m=$1
-	local n=$2
-	letter=$3
-	if [[ ${game_Board[$m,$n]} == $letter ]]
-	then
-		((checkCount++))
-	elif [[ ${game_Board[$m,$n]} == $"-" ]]
-	then
-		((newLetterCount++))
-		row=$m
-		column=$n
-	fi
-}
 
-function computerWinning() {
-	checkLetter=$1
-	putLetter=$2
-	checkFlag=0
-	checkFlag1=0
-	#for row win check
-	if [ $checkFlag1 -eq 0 ]
-	then
-		for((i=0;i<3;i++))
-		do
+	function playGame() {
+	    while [[ $count -lt 9 ]]
+	    do
+		 if [ $flag == 0 ]
+		 then
+			echo "Player Play"
+			 read -p "Enter Row " row
+			 read -p "Enter Col " col
+			 if [[ $row -ge $rows && $col -ge $columns ]]
+			 then
+				echo "Invalid"
+			      elif [[ ${game_Board[$row,$col]} != $player ]]
+			      then
+				    game_Board[$row,$col]=$player
+				    checkWin $player
+				     ((count++))
+				     flag=1
+			      else
+				    echo "Cell Is Not Empty"
+			      fi
+		              elif [ $flag == 1 ]
+			      then
+				     checkFlag=0
+					echo "Computer Play"
+
+                             if [ $checkFlag -eq 0 ]
+            		     then
+				computerWinning $computer $computer
+            		     fi
+            		if [ $checkFlag -eq 0 ]
+            		then
+               			computerWinning $player $computer
+            		fi
+				checkWin $computer
+				((count++))
+				flag=0
+				fi
+				done
+			}
+		tieCount=0
+	function checkWin() {
+		((tieCount++))
+		letter=$1
+		displayGameBoard
+		winAtRowAndColumnPosition	$letter
+		winAtDia $letter
+		if [ $tieCount -gt 8 ]
+		then
+			echo "It's  a Tie"
+			exit
+		fi
+		}
+
+	function computerWinChecking() {
+	         local m=$1
+		local n=$2
+		letter=$3
+		if [[ ${game_Board[$m,$n]} == $letter ]]
+		then
+		      ((checkCount++))
+		elif [[ ${game_Board[$m,$n]} == $"-" ]]
+		then
+		    ((newLetterCount++))
+			row=$m
+			column=$n
+		fi
+ 		}
+
+	function computerWinning() {
+	         checkLetter=$1
+		putLetter=$2
+		checkFlag=0
+		checkFlag1=0
+
+   	        if [ $checkFlag1 -eq 0 ]
+		then
+		    for((i=0;i<3;i++))
+		    do
 			checkCount=0
 			newLetterCount=0
 			for((j=0;j<3;j++))
@@ -147,27 +155,26 @@ function computerWinning() {
 	done
 	fi
 
-	#for col win check
-	if [ $checkFlag1 -eq 0 ]
-	then
-		for((i=0;i<3;i++))
-		do
-			checkCount=0
-			newLetterCount=0
+		if [ $checkFlag1 -eq 0 ]
+		then
+			for((i=0;i<3;i++))
+			do
+				checkCount=0
+				newLetterCount=0
 			for((j=0;j<3;j++))
 			do
 				computerWinChecking $j $i $checkLetter
 			done
-			if [[ $checkCount -eq 2 && $newLetterCount -eq 1 ]]
-			then
+			     if [[ $checkCount -eq 2 && $newLetterCount -eq 1 ]]
+			     then
 				game_Board[$row,$column]=$putLetter
 				checkFlag1=1
 				checkFlag=1
-			fi
-		done
+			     fi
+		 done
 	fi
 
-	#for diagonal
+
 	if [ $checkFlag1 -eq 0 ]
 	then
 		checkCount=0
@@ -190,7 +197,7 @@ function computerWinning() {
 		fi
 	fi
 
-	#diagonal right to left
+
 	if [ $checkFlag1 -eq 0 ]
 	then
 		checkCount=0
