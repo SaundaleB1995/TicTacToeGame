@@ -30,3 +30,18 @@ function displayGameBoard() {
 
 resettingBoard
 displayGameBoard
+
+
+    function assignedLetter() {
+	if [ $((RANDOM%2)) -eq 1 ]
+	then
+		player="X"
+		computer="O"
+	else
+		player="O"
+		computer="X"
+	fi
+	echo "Assigned Player Letter: " $player
+	echo "Assigned Computer Letter: " $computer
+}
+assignedLetter
