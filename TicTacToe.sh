@@ -1,36 +1,41 @@
 #!/bin/bash
      echo "Welcome to Tic Tac Toe Game"
 
-   row=3
-column=3
+
+#!/bin/bash
+echo "Welcome To Tic Tac Toe Game"
+
+rows=3
+columns=3
 
 declare -A game_Board
-function resettingBoard()
+function resettingBoard() 
 {
-    for ((i=0;i<row;i++))
-    do
-      for((j=0;j<column;j++))
-      do  game_Board[$i,$j]="-"
-      done
-    done
+	for ((i=0; i<rows; i++))
+	do
+		for ((j=0; j<columns; j++))
+		do
+			game_Board[$i,$j]="-"
+		done
+	done
 }
-
-    function assignedLetter() {
+function assignletters() {
 	if [ $((RANDOM%2)) -eq 1 ]
 	then
-		player="X"
-		computer="O"
+		Player="X"
+		Computer="O"
 	else
-		player="O"
-		computer="X"
+		Player="O"
+		Computer="X"
 	fi
-	echo "Assigned Player Letter: " $player
-	echo "Assigned Computer Letter: " $computer
+	echo "Assigned Player Symbol: " $Player
+	echo "Assigned Computer Symbol: " $Computer
 }
 
-
-function checkPlayer() {
-	if [ $((RANDOM%2)) -eq 0 ]
+resettingBoard
+assignletters
+function checkFirstPlay() {
+	if [ $((RANDOM%2)) -eq 1 ]
 	then
 		flag=0
 		echo "Player Play First"
@@ -39,33 +44,88 @@ function checkPlayer() {
 		echo "Computer Play First"
 	fi
 }
-checkPlayer
-
-function displayGameBoard() {
-	for((i=1;i<=row;i++))
+checkFirstPlay
+function displayGameBoard() 
+{
+	echo ""
+	for((i=0;i<rows;i++))
 	do
-		echo ""
-		echo -n "|"
-		for((j=1;j<=column;j++))
+		for((j=0;j<columns;j++))
 		do
-			if [ boardOfGame[$i,$j] == 0 ]
+			echo -n "| ${game_Board[$i,$j]} |"
+		done
+		echo
+		echo ""
+	done
+}
+displayGameBoard
+count=0
+function playGame() 
+{
+	while [[ $count -lt 9 ]]
+	do
+		read -p "Enter Player Row " row
+		read -p "Enter Player Col " col
+		if [[ ${game_Board[$row,$col]} != $Player ]]
+		then
+			game_Board[$row,$col]=$Player
+			displayGameBoard
+			winAtRowPosition	$Player
+			winAtColPosition $Player
+			winAtDia $Player
+			((count++))
+		else
+			echo "Invalid"
+		fi
+	done
+}
+
+function winAtRowPosition() 
+{
+	for((r=0;r<3;r++))
+	do
+		for((c=0;c<3;c++))
+		do
+			if [[ ${game_Board[$r,$c]} == ${game_Board[$r,$(($c+1))]} ]] && [[ ${game_Board[$r,$(($c+1))]} == ${game_Board[$r,$(($c+2))]} ]] && [[ ${game_Board[$r,$c]} == $1 ]]
 			then
-				echo " X |"
-			elif [ boardOfGame[$i,$j] == 1 ]
-			then
-				echo " O |"
-			else
-				#echo -n "   |"
-				echo -n " + |"
-				
+				echo $1 "Win"
+				exit
 			fi
 		done
-		echo  ""
 	done
-	echo ""
 }
-resettingBoard
-assignedLetter
-checkPlayer
-displayGameBoard
+
+function winAtColPosition() 
+{
+	for((r=0;r<3;r++))
+	do
+		for((c=0;c<3;c++))
+		do
+			if [[ ${game_Board[$r,$c]} == ${game_Board[$(($r+1)),$c]} ]] && [[ ${game_Board[$(($r+1)),$c]} == ${game_Board[$(($r+2)),$c]} ]] && [[ ${game_Board[$r,$c]} == $1 ]]
+			then
+				echo $1 "Win"
+				exit
+			fi
+		done
+	done
+}
+
+function winAtDia() 
+{
+	if [[ ${game_Board[0,0]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,2]} ]] && [[ ${game_Board[0,0]} == $1 ]]
+	then
+		echo $1 "Win"
+		exit
+	elif [[ ${game_Board[0,2]} == ${game_Board[1,1]} ]] && [[ ${game_Board[1,1]} == ${game_Board[2,0]} ]] && [[ ${game_Board[0,2]} == $1 ]]
+	then
+		echo $1 "Win"
+		exit
+	fi
+}
+
+playGame
+
+
+
+
 
